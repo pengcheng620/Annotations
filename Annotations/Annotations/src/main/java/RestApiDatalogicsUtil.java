@@ -66,12 +66,8 @@ public class RestApiDatalogicsUtil {
 
                 double textWidth = fontSize * 5 / 18;
                 this.padding = textWidth / 2 + this.borderWidth / 2;
-                RestApiDatalogicsUtil util = new RestApiDatalogicsUtil();
-                Font dLFont1 = util.getFont();
-                double measuredWidth = dLFont1.measureTextWidth("A", appearanceFontSize);
-                this.measuredWidth = measuredWidth;
-
-                this.textToRectTop = this.borderWidth + measuredWidth;
+                this.measuredWidth = this.appearanceFontSize * 0.56;
+                this.textToRectTop = this.borderWidth + this.measuredWidth;
                 this.textToRectLeft = this.borderWidth * 3 - this.appearanceFontSize * 0.15;
             } else {
                 this.padding = this.appearanceFontSize / 2 + this.borderWidth;
@@ -85,6 +81,8 @@ public class RestApiDatalogicsUtil {
     DestDocumentRect destDocumentRect;
     Page curPage;
     static PaddingText paddingText;
+
+    private static final String NEW_LINE_FLAG = "<NL>";
 
     private static final String PDF_EXTENSION = ".pdf";
     private static final String LMV_MARKUP_TYPE = "type";
@@ -140,7 +138,7 @@ public class RestApiDatalogicsUtil {
 //            util.generateLmvMarkupDocument(x15.mp, x15.sourceLmvRect, x15.inputFile, x15.outputFile);
 //
             MarkupsData.Dwg22x17 dwg22x17 = new MarkupsData.Dwg22x17();
-            util.generateLmvMarkupDocument(dwg22x17.multipleText, dwg22x17.sourceLmvRect, dwg22x17.inputFile, dwg22x17.outputFile);
+            util.generateLmvMarkupDocument(dwg22x17.difFS2, dwg22x17.sourceLmvRect, dwg22x17.inputFile, dwg22x17.outputFile);
 
 //            util.generateLmvMarkupDocument(MarkupsData.lxData, sourcePDF1, inputFile, outputFile);
 //            util.generateLmvMarkupDocument(lxData, sourceLmvRect, inputFileName, outputFileName);
@@ -646,7 +644,7 @@ public class RestApiDatalogicsUtil {
         Double x = scale.getDouble("x");
         Double y = scale.getDouble("y");
         boolean noRectify = x == 1 && y == 1;
-        return noRectify ? new Point(x, y) :rectifyRotationOfPoint(x, y);
+        return noRectify ? new Point(x, y) : rectifyRotationOfPoint(x, y);
     }
 
     private Point rectifyRotationOfPoint(double x, double y) {
@@ -892,7 +890,8 @@ public class RestApiDatalogicsUtil {
         Text text = getText();
         int i = 0;
         if (annotationText != null) {
-            String[] textSegments = annotationText.split("\\s");
+            String annotationTextWithFlags = annotationText.replace("\n", " " + NEW_LINE_FLAG + " ");
+            String[] textSegments = annotationTextWithFlags.split("\\s+");
             double totalWidth = rectWidth - 2 * padding + fontSize / 2;
             totalWidth = calculateTotalWidth(isRectRotated, totalWidth, fontSize, rectWidth);
             double remainingWidth = totalWidth;
@@ -903,10 +902,6 @@ public class RestApiDatalogicsUtil {
 
             double horizPos = rectLeft + paddingText.textToRectLeft;
             double vertPos = rectTop - paddingText.textToRectTop;
-            if (isRectRotated) {
-                horizPos = rectLeft + paddingText.textToRectLeft;
-                vertPos = rectTop - paddingText.textToRectTop;
-            }
 
             String currentSegment = textSegments[0];
             StringBuilder currentLine = new StringBuilder();
@@ -916,7 +911,13 @@ public class RestApiDatalogicsUtil {
                 double dummyAdvance = getAdvance(dummy);
                 boolean shouldHandleText = false;
 
-                if (dummyAdvance > totalWidth) {
+                if (NEW_LINE_FLAG.equals(currentSegment)) {
+                    String replacedString = currentLine.toString().replace(NEW_LINE_FLAG, "");
+                    currentLine.setLength(0);
+                    currentLine.append(replacedString);
+                    currentSegment = handleCurrentLine(currentLine, "", textSegments, ++i);
+                    shouldHandleText = true;
+                } else if (dummyAdvance > totalWidth) {
                     int split = findBreakPoint(currentSegment, remainingWidth - spaceAdv, dLFont, gsTextRun, textState);
                     currentSegment = generateCurrentSegment(currentSegment, currentLine, split);
                     shouldHandleText = true;
