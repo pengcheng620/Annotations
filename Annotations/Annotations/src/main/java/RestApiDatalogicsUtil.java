@@ -84,6 +84,10 @@ public class RestApiDatalogicsUtil {
 
     private static final String NEW_LINE_FLAG = "<NL>";
 
+    private static final String LMV_MARKUP_FONT_FACE = "Artifakt Element";
+    //    private static final String LMV_MARKUP_FONT_FACE = "Microsoft YaHe";
+    private static final String LMV_MARKUP_DEFAULT_FONT_FACE = "sans-serif";
+
     private static final String PDF_EXTENSION = ".pdf";
     private static final String LMV_MARKUP_TYPE = "type";
     private static final String LMV_MARKUP_TYPE_CLOUD = "cloud";
@@ -137,8 +141,11 @@ public class RestApiDatalogicsUtil {
 //            MarkupsData.Pdf15x15 x15 = new MarkupsData.Pdf15x15();
 //            util.generateLmvMarkupDocument(x15.mp, x15.sourceLmvRect, x15.inputFile, x15.outputFile);
 //
-            MarkupsData.Dwg22x17 dwg22x17 = new MarkupsData.Dwg22x17();
-            util.generateLmvMarkupDocument(dwg22x17.difFS2, dwg22x17.sourceLmvRect, dwg22x17.inputFile, dwg22x17.outputFile);
+//            MarkupsData.Dwg22x17 dwg22x17 = new MarkupsData.Dwg22x17();
+//            util.generateLmvMarkupDocument(dwg22x17.textChinese, dwg22x17.sourceLmvRect, dwg22x17.inputFile, dwg22x17.outputFile);
+
+            MarkupsData.PDFText pdfText = new MarkupsData.PDFText();
+            util.generateLmvMarkupDocument(pdfText.simpleText, pdfText.sourceLmvRect, pdfText.inputFile, pdfText.outputFile);
 
 //            util.generateLmvMarkupDocument(MarkupsData.lxData, sourcePDF1, inputFile, outputFile);
 //            util.generateLmvMarkupDocument(lxData, sourceLmvRect, inputFileName, outputFileName);
@@ -234,6 +241,7 @@ public class RestApiDatalogicsUtil {
      * @param createdByUserName The name of the user who created the markup.
      */
 
+
     void translateEllipseOrRectangle(Document doc, Page page, JSONObject markup, String createdByUserName) {
         String type = markup.getString(LMV_MARKUP_TYPE);
         JSONObject state = markup.getJSONObject(LMV_MARKUP_STATE);
@@ -270,7 +278,6 @@ public class RestApiDatalogicsUtil {
         circleAnnotation.setBorderStyleWidth(borderWidth);
         return circleAnnotation;
     }
-
 
     SquareAnnotation getSquareAnnotation(Page page, Rect transformedRect, Double borderWidth) {
         SquareAnnotation squareAnnotation = new SquareAnnotation(page, transformedRect);
@@ -313,11 +320,6 @@ public class RestApiDatalogicsUtil {
         annot.setContents(text);
         annot.setTextColor(translateColor(fontColor));
         annot.setFontSize(fontSizeInPoints);
-        try {
-            annot.setFontFace("Artifakt Element");
-        } catch (Exception e) {
-            annot.setFontFace("Arial");
-        }
         annot.setBorderStyleWidth(borderWidth * 2);
 
         setNormalAppearance(annot, markup, LMV_MARKUP_TYPE_CALLOUT);
@@ -480,7 +482,7 @@ public class RestApiDatalogicsUtil {
         }
     }
 
-    private void rectifyRotationOfPage(Page page, Text text, FreeTextAnnotation annot) {
+    void rectifyRotationOfPage(Page page, Text text, FreeTextAnnotation annot) {
         PageRotation originPageRotation = page.getRotation();
 
         double w = annot.getRect().getWidth();
@@ -620,7 +622,6 @@ public class RestApiDatalogicsUtil {
         annot.getNormalAppearance().getStream().getDict().put("Matrix", pdfArray);
     }
 
-
     PDFArray getPDFArray(Document doc, boolean indirect, Matrix rotateMatrix) {
         PDFArray pdfArray = new PDFArray(doc, indirect);
         pdfArray.put(0, new PDFReal(rotateMatrix.getA(), doc, false));
@@ -632,22 +633,20 @@ public class RestApiDatalogicsUtil {
         return pdfArray;
     }
 
-
     Point translateTranslation(JSONObject translation) {
-        Double x = translation.getDouble("x") * (destDocumentRect.width / sourceLmvRect.width);
-        Double y = translation.getDouble("y") * (destDocumentRect.height / sourceLmvRect.height);
+        double x = translation.getDouble("x") * (destDocumentRect.width / sourceLmvRect.width);
+        double y = translation.getDouble("y") * (destDocumentRect.height / sourceLmvRect.height);
         return rectifyRotationOfPoint(x, y);
     }
 
-
     Point translateScale(JSONObject scale) {
-        Double x = scale.getDouble("x");
-        Double y = scale.getDouble("y");
+        double x = scale.getDouble("x");
+        double y = scale.getDouble("y");
         boolean noRectify = x == 1 && y == 1;
         return noRectify ? new Point(x, y) : rectifyRotationOfPoint(x, y);
     }
 
-    private Point rectifyRotationOfPoint(double x, double y) {
+    Point rectifyRotationOfPoint(double x, double y) {
         if (curPage.getRotation() == PageRotation.ROTATE_90) {
             return new Point(-y, x);
         } else if (curPage.getRotation() == PageRotation.ROTATE_180) {
@@ -657,7 +656,6 @@ public class RestApiDatalogicsUtil {
         }
         return new Point(x, y);
     }
-
 
     Double translateBorderStyleWidth(Double strokeWidth) {
         return strokeWidth * destDocumentRect.width / sourceLmvRect.width;
@@ -670,7 +668,6 @@ public class RestApiDatalogicsUtil {
         Double b = Integer.parseInt(hexColor.substring(4, 6), 16) / 255.0;
         return new Double[]{r, g, b};
     }
-
 
     Color translateColor(String hexColor) {
         Double[] rgb = hexToRgb(hexColor);
@@ -690,7 +687,7 @@ public class RestApiDatalogicsUtil {
         return points;
     }
 
-    private Matrix getRotationMatrix(Page page) {
+    Matrix getRotationMatrix(Page page) {
         PageRotation originPageRotation = page.getRotation();
 
         switch (originPageRotation) {
@@ -763,7 +760,6 @@ public class RestApiDatalogicsUtil {
         }
         ((PolyLineAnnotation) annot).setVertices(transPoints);
     }
-
 
     double getAdvance(TextRun tr) {
         Text dummy = new Text();
@@ -838,7 +834,7 @@ public class RestApiDatalogicsUtil {
         }
     }
 
-    private String generateCurrentSegment(String currentSegment, StringBuilder currentLine, int split) {
+    String generateCurrentSegment(String currentSegment, StringBuilder currentLine, int split) {
         if (split != -1) {
             String firstHalf = currentSegment.substring(0, split);
             if (currentLine.length() > 0) {
@@ -973,21 +969,21 @@ public class RestApiDatalogicsUtil {
         return rectWidth;
     }
 
-    private double calculateHorizontalPosition(boolean isRectRotated, double horizPos, Rect rect, double padding) {
+    double calculateHorizontalPosition(boolean isRectRotated, double horizPos, Rect rect, double padding) {
         if (!isRectRotated) {
             horizPos = rect.getLeft() + padding;
         }
         return horizPos;
     }
 
-    private double calculateTotalWidth(boolean isRectRotated, double totalWidth, double fontSize, double rectWidth) {
+    double calculateTotalWidth(boolean isRectRotated, double totalWidth, double fontSize, double rectWidth) {
         if (isRectRotated) {
             totalWidth = rectWidth - (2 * (paddingText.borderWidth + paddingText.measuredWidth)) + fontSize * 4 / 9;
         }
         return totalWidth;
     }
 
-    private int calculateAlign(FreeTextAnnotation freeTextAnnot) {
+    int calculateAlign(FreeTextAnnotation freeTextAnnot) {
         int align = 0;
         HorizontalAlignment q = freeTextAnnot.getQuadding();
         if (q == HorizontalAlignment.CENTER) {
@@ -1014,13 +1010,13 @@ public class RestApiDatalogicsUtil {
      * The below methods are primarily designed for facilitating unit testing.
      */
 
+
     Document getDocument(java.nio.file.Path tempFile) {
         return new Document(tempFile.toString());
     }
 
     Library initPdfLibrary() {
-//		Library.setLicenseKey("7524-5023-3866-2061");
-        Library.setLicenseKey("7905-5023-7336-0131");
+        Library.setLicenseKey(licenseKey);
         return new Library();
     }
 
@@ -1031,7 +1027,7 @@ public class RestApiDatalogicsUtil {
 
 
     Font getFont() {
-        return new Font("Artifakt Element", EnumSet.of(FontCreateFlags.DO_NOT_EMBED));
+        return new Font("Artifakt Element1111", EnumSet.of(FontCreateFlags.DO_NOT_EMBED));
     }
 
 
