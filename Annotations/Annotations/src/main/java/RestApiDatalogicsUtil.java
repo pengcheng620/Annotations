@@ -1,8 +1,14 @@
 import com.datalogics.PDFL.*;
+import com.datalogics.PDFL.Color;
+import com.datalogics.PDFL.Container;
+import com.datalogics.PDFL.Font;
+import com.datalogics.PDFL.Point;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class RestApiDatalogicsUtil {
     public static class DestDocumentRect {
@@ -121,6 +127,15 @@ public class RestApiDatalogicsUtil {
 
     public static void main(String[] args) throws Exception {
         System.out.println("Add Annotation to PDF:");
+        // 获取当前系统的GraphicsEnvironment实例
+//        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+//
+//        // 获取并打印所有已安装字体家族名称
+//        String[] fontFamilies = ge.getAvailableFontFamilyNames();
+//        System.out.println("已安装的字体家族：");
+//        for (String fontFamily : fontFamilies) {
+//            System.out.println(fontFamily);
+//        }
 
         Library lib = new Library();
         try {
@@ -145,7 +160,7 @@ public class RestApiDatalogicsUtil {
 //            util.generateLmvMarkupDocument(dwg22x17.textChinese, dwg22x17.sourceLmvRect, dwg22x17.inputFile, dwg22x17.outputFile);
 
             MarkupsData.PDFText pdfText = new MarkupsData.PDFText();
-            util.generateLmvMarkupDocument(pdfText.simpleText, pdfText.sourceLmvRect, pdfText.inputFile, pdfText.outputFile);
+            util.generateLmvMarkupDocument(pdfText.mixText, pdfText.sourceLmvRect, pdfText.inputFile, pdfText.outputFile);
 
 //            util.generateLmvMarkupDocument(MarkupsData.lxData, sourcePDF1, inputFile, outputFile);
 //            util.generateLmvMarkupDocument(lxData, sourceLmvRect, inputFileName, outputFileName);
@@ -320,6 +335,11 @@ public class RestApiDatalogicsUtil {
         annot.setContents(text);
         annot.setTextColor(translateColor(fontColor));
         annot.setFontSize(fontSizeInPoints);
+        try {
+            annot.setFontFace("Microsoft YaHei");
+        } catch (Exception e) {
+            annot.setFontFace("Arial");
+        }
         annot.setBorderStyleWidth(borderWidth * 2);
 
         setNormalAppearance(annot, markup, LMV_MARKUP_TYPE_CALLOUT);
@@ -1027,7 +1047,8 @@ public class RestApiDatalogicsUtil {
 
 
     Font getFont() {
-        return new Font("Artifakt Element1111", EnumSet.of(FontCreateFlags.DO_NOT_EMBED));
+//        return new Font("Artifakt Element", EnumSet.of(FontCreateFlags.DO_NOT_EMBED));
+        return new Font("Microsoft YaHei", EnumSet.of(FontCreateFlags.EMBEDDED));
     }
 
 

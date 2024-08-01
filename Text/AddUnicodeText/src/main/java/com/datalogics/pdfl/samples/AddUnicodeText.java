@@ -1,24 +1,15 @@
 package com.datalogics.pdfl.samples;
 
 /*
-  * 
+ *
  * This sample program adds six lines of Unicode text to a PDF file, in six different languages.
  *
  * Copyright (c) 2007-2023, Datalogics, Inc. All rights reserved.
  *
  */
-import com.datalogics.PDFL.Document;
-import com.datalogics.PDFL.EmbedFlags;
-import com.datalogics.PDFL.Font;
-import com.datalogics.PDFL.GraphicState;
-import com.datalogics.PDFL.Library;
-import com.datalogics.PDFL.Matrix;
-import com.datalogics.PDFL.Page;
-import com.datalogics.PDFL.Rect;
-import com.datalogics.PDFL.SaveFlags;
-import com.datalogics.PDFL.Text;
-import com.datalogics.PDFL.TextRun;
-import com.datalogics.PDFL.TextState;
+
+import com.datalogics.PDFL.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.EnumSet;
@@ -39,6 +30,8 @@ public class AddUnicodeText {
                 sOutput = args[0];
             System.out.println("Output file: " + sOutput);
             Document doc = new Document();
+            System.out.println("version:::::" + doc.getVersionString());
+
             Rect pageRect = new Rect(0, 0, 612, 792);
             Page docpage = doc.createPage(Document.BEFORE_FIRST_PAGE, pageRect);
 
@@ -48,7 +41,7 @@ public class AddUnicodeText {
 
             List<String> strings = new ArrayList<String>();
 
-            strings.add("Chinese (Mandarin) - \u4e16\u754c\u4eba\u6743\u5ba3\u8a00");
+            strings.add("Chinese (Mandarin)111111111111 - Chinese (Mandarin) - 世界人权宣言");
             strings.add("Japanese - \u300e\u4e16\u754c\u4eba\u6a29\u5ba3\u8a00\u300f");
             strings.add("French - \u0044\u00e9\u0063\u006c\u0061\u0072\u0061\u0074\u0069\u006f\u006e\u0020\u0075\u006e\u0069\u0076\u0065\u0072\u0073\u0065\u006c\u006c\u0065\u0020\u0064\u0065\u0073\u0020\u0064\u0072\u006f\u0069\u0074\u0073\u0020\u0064\u0065\u0020\u006c\u2019\u0068\u006f\u006d\u006d\u0065");
             strings.add("Korean - \uc138\u0020\uacc4\u0020\uc778\u0020\uad8c\u0020\uc120\u0020\uc5b8");
@@ -57,7 +50,7 @@ public class AddUnicodeText {
             strings.add("Russian - \u0412\u0441\u0435\u043e\u0431\u0449\u0430\u044f\u0020\u0434\u0435\u043a\u043b\u0430\u0440\u0430\u0446\u0438\u044f\u0020\u043f\u0440\u0430\u0432\u0020\u0447\u0435\u043b\u043e\u0432\u0435\u043a\u0430");
 
             List<Font> fonts = new ArrayList<Font>();
-            fonts.add(new Font("CourierStd"));
+            fonts.add(new Font("Microsoft YaHei"));
             fonts.add(new Font("KozGoPr6N-Medium"));
             fonts.add(new Font("AdobeMyungjoStd-Medium"));
 
@@ -72,7 +65,7 @@ public class AddUnicodeText {
                     System.out.println("Couldn't find a font that can represent all characters in the string: " + str);
                 } else {
                     // From this point, the string is handled the same way as non-Unicode text.
-                    Matrix m = new Matrix(14, 0, 0, 14, x, y);
+                    Matrix m = new Matrix(10, 0, 0, 10, x, y);
                     TextRun tr = new TextRun(font.getName() + " - " + str, font, gs, ts, m);
                     unicodeText.addRun(tr);
                 }
@@ -82,6 +75,17 @@ public class AddUnicodeText {
             }
             docpage.getContent().addElement(unicodeText);
             docpage.updateContent();
+
+
+            Rect textRect = new Rect(0, 0, 100, 200);
+            FreeTextAnnotation annotation = new FreeTextAnnotation(docpage, textRect, "");
+
+            annotation.setFontSize(14);
+            annotation.setContents("Chinese (Mandarin)111111111111 - Chinese (Mandarin) - 世界人权宣言");
+            annotation.setTextColor(new Color(0.5, 0.5, 0.5));
+//            annotation.setFontFace("KozGoPr6N-Medium");
+            annotation.setFontFace("Microsoft YaHei");
+            annotation.setNormalAppearance(annotation.generateAppearance());
 
             // Save the document.
             System.out.println("Embedding fonts.");
@@ -93,6 +97,7 @@ public class AddUnicodeText {
             lib.delete();
         }
     }
+
 
     public static Font GetRepresentableFont(List<Font> fonts, String str) {
         for (Font font : fonts) {

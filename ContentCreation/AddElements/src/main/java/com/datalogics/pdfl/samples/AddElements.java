@@ -6,71 +6,73 @@ package com.datalogics.pdfl.samples;
  * create colored text, text that is vertical or at an angle, and a shape with color fill.
  * The third page features a rectangle and a curved design. Use this sample for ideas on how
  * to draw an image on a PDF page.
- * 
+ *
  * Copyright (c) 2007-2023, Datalogics, Inc. All rights reserved.
  *
  */
+
 import com.datalogics.PDFL.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.EnumSet;
-public class AddElements
-{
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) throws Throwable {
+public class AddElements {
+
+    /**
+     * @param args
+     */
+    public static void main(String[] args) throws Throwable {
         System.out.println("Add Elements sample:");
 
-    	Library lib = new Library();
+        Library lib = new Library();
 
-		try {
-			System.out.println("Initialized the library.");
-             String sOutput = "AddElements-out.pdf";
-             if (args.length != 0)
-                 sOutput = args[0];
-             System.out.println("Output file: " + sOutput);
-             Document doc = new Document();
-             Rect pageRect = new Rect(0, 0, 612, 792);
-             Page docpage = doc.createPage(Document.BEFORE_FIRST_PAGE, pageRect);
+        try {
+            System.out.println("Initialized the library.");
+            String sOutput = "AddElements-out.pdf";
+            if (args.length != 0)
+                sOutput = args[0];
+            System.out.println("Output file: " + sOutput);
+            Document doc = new Document();
+            Rect pageRect = new Rect(0, 0, 612, 792);
+            Page docpage = doc.createPage(Document.BEFORE_FIRST_PAGE, pageRect);
 
-             // Draw a five pointed star.
-             Path starpath = new Path();
-             GraphicState gs = starpath.getGraphicState();
+            // Draw a five pointed star.
+            Path starpath = new Path();
+            GraphicState gs = starpath.getGraphicState();
 
-             starpath.setPaintOp(EnumSet.of(PathPaintOpFlags.STROKE));
-             gs.setWidth(2.0); // make the line thickness 2 PDF coordinates.
-             List<Double> DashPattern = Arrays.asList(3.0, 5.0, 6.0); // Set 3 for the Dash Phase and the Dash Pattern list to [5 6]
-             gs.setDashPattern(DashPattern);
-             gs.setStrokeColor(new Color(0, 1.0, 0));// Green Star
-             starpath.setGraphicState(gs);
-             double CenterX = 306.0; // Center of Page
-             double CenterY = 396.0;
-             double Radius = 72 * 4.0; // 4 inches with 72 dpi
-             double radians72 = 72/(45/Math.atan(1.0)); // angles must be in radians.
-             double radians36 = 36/(45/Math.atan(1.0));
-             Point CenterPoint = new Point(CenterX, CenterY);
-             Point Point0 = new Point(CenterX, CenterY+Radius);
-             Point Point1 = new Point(CenterX+Radius*Math.sin(radians72), CenterY+Radius*Math.cos(radians72));
-             Point Point2 = new Point(CenterX + Radius*Math.sin(radians36), CenterY - Radius*Math.cos(radians36));
-             Point Point3 = new Point(CenterX - Radius*Math.sin(radians36),CenterY - Radius*Math.cos(radians36));
-             Point Point4 = new Point (CenterX - Radius * Math.sin(radians72), CenterY + Radius * Math.cos(radians72));
-             starpath.moveTo(Point0);
-             starpath.addLine(Point2);
-             starpath.addLine(Point4);
-             starpath.addLine(Point1);
-             starpath.addLine(Point3);
-             starpath.addLine(Point0);
-             starpath.closePath();
-             docpage.getContent().addElement(starpath);  // Add the new element to the Content of the page.
-            
+            starpath.setPaintOp(EnumSet.of(PathPaintOpFlags.STROKE));
+            gs.setWidth(2.0); // make the line thickness 2 PDF coordinates.
+            List<Double> DashPattern = Arrays.asList(3.0, 5.0, 6.0); // Set 3 for the Dash Phase and the Dash Pattern list to [5 6]
+            gs.setDashPattern(DashPattern);
+            gs.setStrokeColor(new Color(0, 1.0, 0));// Green Star
+            starpath.setGraphicState(gs);
+            double CenterX = 306.0; // Center of Page
+            double CenterY = 396.0;
+            double Radius = 72 * 4.0; // 4 inches with 72 dpi
+            double radians72 = 72 / (45 / Math.atan(1.0)); // angles must be in radians.
+            double radians36 = 36 / (45 / Math.atan(1.0));
+            Point CenterPoint = new Point(CenterX, CenterY);
+            Point Point0 = new Point(CenterX, CenterY + Radius);
+            Point Point1 = new Point(CenterX + Radius * Math.sin(radians72), CenterY + Radius * Math.cos(radians72));
+            Point Point2 = new Point(CenterX + Radius * Math.sin(radians36), CenterY - Radius * Math.cos(radians36));
+            Point Point3 = new Point(CenterX - Radius * Math.sin(radians36), CenterY - Radius * Math.cos(radians36));
+            Point Point4 = new Point(CenterX - Radius * Math.sin(radians72), CenterY + Radius * Math.cos(radians72));
+            starpath.moveTo(Point0);
+            starpath.addLine(Point2);
+            starpath.addLine(Point4);
+            starpath.addLine(Point1);
+            starpath.addLine(Point3);
+            starpath.addLine(Point0);
+            starpath.closePath();
+            docpage.getContent().addElement(starpath);  // Add the new element to the Content of the page.
+
             // Draw a pentagon around the star
             Path pentpath = new Path();
             pentpath.setPaintOp(EnumSet.of(PathPaintOpFlags.STROKE));
             gs.setWidth(2.0);
-            
+
             List<Double> PentDashPattern = Arrays.asList(0.0, 3.0); // Set 0 for the Dash Phase and the Dash Pattern list to [3]
             gs.setDashPattern(PentDashPattern);
             gs.setStrokeColor(new Color(1.0, 0, 1.0)); // purple pentagon
@@ -83,7 +85,7 @@ public class AddElements
             pentpath.addLine(Point0);
             pentpath.closePath();
             docpage.getContent().addElement(pentpath); // Add the new element to the Content of the page.
-            
+
             // Add a single line star in the middle of the big star
             Path newstar = new Path();
             newstar.setPaintOp(EnumSet.of(PathPaintOpFlags.EO_FILL));
@@ -105,26 +107,26 @@ public class AddElements
             newstar.closePath();
             docpage.getContent().addElement(newstar);
             docpage.updateContent();
-            
+
             /* Second page: a diamond with text inside */
             docpage = doc.createPage(0, pageRect);
-            
+
             Path diamond = new Path();
             diamond.setPaintOp(EnumSet.of(PathPaintOpFlags.EO_FILL, PathPaintOpFlags.STROKE));
-            gs.setStrokeColor(new Color(153.0/255.0, 0, 0)); // deep red
+            gs.setStrokeColor(new Color(153.0 / 255.0, 0, 0)); // deep red
             gs.setFillColor(new Color(1.0, 1.0, 0)); // Yellow
-            
+
             ArrayList<Double> rectDashPattern = new ArrayList<Double>();
             gs.setDashPattern(rectDashPattern);
-            
+
             gs.setWidth(1.0);
             gs.setLineJoin(LineJoin.BEVEL_JOIN);
             diamond.setGraphicState(gs);
 
             diamond.moveTo(new Point(306, 198));
-            diamond.addLine( new Point(459, 396));
+            diamond.addLine(new Point(459, 396));
             diamond.addLine(new Point(306, 594));
-            diamond.addLine( new Point(153, 396));
+            diamond.addLine(new Point(153, 396));
             diamond.addLine(new Point(306, 198));
             diamond.closePath();
             docpage.getContent().addElement(diamond); // Add the new element to the Content of the page.
@@ -133,10 +135,10 @@ public class AddElements
 // the fill color from the graphic state
             Text t = new Text();
             Font f = new Font("Arial", EnumSet.of(FontCreateFlags.EMBEDDED, FontCreateFlags.SUBSET));
-            gs.setFillColor( new Color(0, 0, 1.0));
+            gs.setFillColor(new Color(0, 0, 1.0));
             TextState ts = new TextState();
 
-            Matrix m = new Matrix().translate(180, 414).scale(24.0, 24.0);
+            Matrix m = new Matrix().translate(0, 0).scale(24.0, 24.0);
             TextRun tr = new TextRun("Horizontal Blue Text", f, gs, ts, m);
             t.addRun(tr);
 
@@ -182,15 +184,14 @@ public class AddElements
             docpage.updateContent();
 
 
-            doc.embedFonts(EnumSet.of(EmbedFlags.NONE), new AEProgressMonitor(), 
+            doc.embedFonts(EnumSet.of(EmbedFlags.NONE), new AEProgressMonitor(),
                     new AECancelProc(), new AEReportProc());
             doc.save(EnumSet.of(SaveFlags.FULL), sOutput,
                     new AEProgressMonitor(), new AECancelProc());
 
-		}
-		finally {
-			lib.delete();
-		}
-	}
+        } finally {
+            lib.delete();
+        }
+    }
 
 }

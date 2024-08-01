@@ -79,6 +79,11 @@
       <version>18.35.0</version>
       <classifier>javadoc</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20231013</version>
+    </dependency>
   </dependencies>
   <build>
     <pluginManagement>

@@ -20,3 +20,5 @@ The sample normally highlights search text with a box that surrounds the entire 
 
 ## ***TextExtract***
 Extracts text from a tagged and untagged PDF document.
+
+
